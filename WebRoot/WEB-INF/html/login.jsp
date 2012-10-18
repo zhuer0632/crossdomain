@@ -70,7 +70,7 @@
 				</form>
 		</div>
 
-
+		
 		<div>
 			登录 财价系统的 网址是：
 			<a href="http://xj.gldjc.com/info_prices/22145/trend" target="_blank">查看登录后的网址</a>
@@ -82,7 +82,7 @@
 				<input type="submit" value="提交" />
 			</form>
 		</div>
-
+		
 		<div>
 
 			注销
@@ -92,7 +92,7 @@
 				<input type="submit" value="提交" />
 			</form>
 		</div>
-
+		
 		<div>
 			验证
 			<form action="http://xj.gldjc.com/api/users/check" method="get">
@@ -101,7 +101,7 @@
 				<input type="submit" value="提交" />
 			</form>
 		</div>
-
+		
 		<div>
 			注册
 			<br>

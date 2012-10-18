@@ -1,6 +1,5 @@
 package com.me.biz;
 
-
 import java.io.File;
 import java.io.IOException;
 import java.util.Hashtable;
@@ -10,9 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.client.params.CookiePolicy;
-import org.apache.http.cookie.Cookie;
-import org.apache.http.cookie.CookieSpec;
+import org.nutz.json.Json;
 import org.springframework.stereotype.Controller;
 
 import com.me.http.CharSets;
@@ -20,49 +17,43 @@ import com.me.http.Dump;
 import com.me.http.HttpUT;
 import com.me.http.TextHttpResponse;
 
-
 @Controller
-public class PriceSysBiz
-{
+public class PriceSysBiz {
 
-    public TextHttpResponse login(String nickname,
-                                  String password)
-    {
+    public TextHttpResponse login(String nickname, String password) {
 
-        Map<String, String> params = new Hashtable<String, String>();
-        params.put("nickname",
-                   StringUtils.trim(nickname));
-        params.put("password",
-                   StringUtils.trim(password));
+	Map<String, String> params = new Hashtable<String, String>();
+	params.put("nickname", StringUtils.trim(nickname));
+	params.put("password", StringUtils.trim(password));
 
-        String out = HttpUT.post("http://xj.gldjc.com/api/users/login",
-                                 params,
-                                 CharSets.UTF_8);
+	TextHttpResponse out = HttpUT.post_response("http://xj.gldjc.com/api/users/login", params,
+		CharSets.UTF_8);
+	Dump.dump(out.getContent());
+	
+	Map map = (Map) Json.fromJson(out.getContent());
+	String token=String.valueOf(map.get("token"));
+	
+	Dump.dump("正在查看第二个页面");
+	
+	String indexContent=HttpUT.get("http://xj.gldjc.com/?auth_token="+token+"");
+	Dump.dump(indexContent);
 
-        Dump.dump(out);
+	
+//	String nexturl = "http://xj.gldjc.com/info_prices/22145/trend?token="+token;
+//	TextHttpResponse res = HttpUT.get_response(nexturl, null,
+//		CharSets.UTF_8);
+	
+//	Dump.dump(res.getContent());
+//	Dump.dump(res.getHeads());
 
-        Dump.dump("正在查看第二个页面");
-
-        String nexturl = "http://xj.gldjc.com/info_prices/22145/trend";
-        TextHttpResponse res = HttpUT.get_response(nexturl,
-                                                   null,
-                                                   CharSets.UTF_8);
-        Dump.dump(res.getContent());
-        Dump.dump(res.getHeads());
-
-        try
-        {
-            FileUtils.writeStringToFile(new File("c:\\content.html"),
-                                        res.getContent(),
-                                        CharSets.UTF_8);
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-        return res;
+	try {
+	    FileUtils.writeStringToFile(new File("c:\\content.html"), out
+		    .getContent(), CharSets.UTF_8);
+	} catch (IOException e) {
+	    e.printStackTrace();
+	}
+	return out;
     }
-
 
     /**
      * 
@@ -82,59 +73,45 @@ public class PriceSysBiz
      * @param nickname
      * @param password
      */
-    public TextHttpResponse login2(String nickname,
-                                   String password)
-    {
+    public TextHttpResponse login2(String nickname, String password) {
 
-        Map<String, String> params = new Hashtable<String, String>();
-        params.put("authenticity_token",
-                   "ZhYo8KO700MhYyGLrNJq/T+jJu2y2JaKDcdeV4ot2Nw=");
-        params.put("commit",
-                   "登录");
-        params.put("loginname",
-                   "zhushaolong321");
-        params.put("lt",
-                   "");
-        params.put("password",
-                   "zhushaolong321");
-        params
-                .put("service",
-                     "http://xj.gldjc.com/user/auth/cas/callback?url=http%3A%2F%2Fxj.gldjc.com%2F");
-        params.put("utf8",
-                   "✓");
+	Map<String, String> params = new Hashtable<String, String>();
+	params.put("authenticity_token",
+		"ZhYo8KO700MhYyGLrNJq/T+jJu2y2JaKDcdeV4ot2Nw=");
+	params.put("commit", "登录");
+	params.put("loginname", "zhushaolong321");
+	params.put("lt", "");
+	params.put("password", "zhushaolong321");
+	params
+		.put("service",
+			"http://xj.gldjc.com/user/auth/cas/callback?url=http%3A%2F%2Fxj.gldjc.com%2F");
+	params.put("utf8", "✓");
 
-        String out = HttpUT.post("http://sso.glodon.com/sessions/login",
-                                 params,
-                                 CharSets.UTF_8);
-        Dump.dump(out);
+	String out = HttpUT.post("http://sso.glodon.com/sessions/login",
+		params, CharSets.UTF_8);
+	Dump.dump(out);
 
-        Dump.dump("正在查看第二个页面");
+	Dump.dump("正在查看第二个页面");
 
-        String nexturl = "http://xj.gldjc.com/info_prices/22145/trend";
-        String content = HttpUT.get(nexturl);
-        Dump.dump(content);
+	String nexturl = "http://xj.gldjc.com/info_prices/22145/trend";
+	String content = HttpUT.get(nexturl);
+	Dump.dump(content);
 
-        nexturl = "http://xj.gldjc.com/info_prices/22145/trend";
-        TextHttpResponse res = HttpUT.get_response(nexturl,
-                                                   null,
-                                                   CharSets.UTF_8);
+	nexturl = "http://xj.gldjc.com/info_prices/22145/trend";
+	TextHttpResponse res = HttpUT.get_response(nexturl, null,
+		CharSets.UTF_8);
 
-        Dump.dump(res.getHeads());
+	Dump.dump(res.getHeads());
 
-        try
-        {
-            FileUtils.writeStringToFile(new File("c:\\content.html"),
-                                        res.getContent(),
-                                        CharSets.UTF_8);
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
+	try {
+	    FileUtils.writeStringToFile(new File("c:\\content.html"), res
+		    .getContent(), CharSets.UTF_8);
+	} catch (IOException e) {
+	    e.printStackTrace();
+	}
 
-        return res;
+	return res;
     }
-
 
     /**
      * 
@@ -144,47 +121,36 @@ public class PriceSysBiz
      * 
      */
     public TextHttpResponse login22(HttpServletRequest request,
-                                    String nickname,
-                                    String password)
-    {
+	    String nickname, String password) {
 
-        Map<String, String> params = new Hashtable<String, String>();
-        params.put("logon_name",
-                   StringUtils.trim(nickname));
-        params.put("logon_password",
-                   StringUtils.trim(password));
+	Map<String, String> params = new Hashtable<String, String>();
+	params.put("logon_name", StringUtils.trim(nickname));
+	params.put("logon_password", StringUtils.trim(password));
 
-        TextHttpResponse out = HttpUT
-                .post_response("http://192.168.1.215:8080/xj/l/login.do",
-                               params,
-                               CharSets.UTF_8);
+	TextHttpResponse out = HttpUT.post_response(
+		"http://192.168.1.215:8080/xj/l/login.do", params,
+		CharSets.UTF_8);
 
-        Dump.dump("\r\n\r\n登录后返回的请求头");
-        Dump.dump(out.getHeads());
-        Dump.dump("\r\n\r\n");
+	Dump.dump("\r\n\r\n登录后返回的请求头");
+	Dump.dump(out.getHeads());
+	Dump.dump("\r\n\r\n");
 
-        Dump.dump("正在查看第二个页面");
-        String nexturl = "http://192.168.1.215:8080/xj/adminCom/listComMgrtoAudit.do";
-        TextHttpResponse res = HttpUT.get_response(nexturl,
-                                                   null,
-                                                   CharSets.UTF_8);
+	Dump.dump("正在查看第二个页面");
+	String nexturl = "http://192.168.1.215:8080/xj/adminCom/listComMgrtoAudit.do";
+	TextHttpResponse res = HttpUT.get_response(nexturl, null,
+		CharSets.UTF_8);
 
-        try
-        {
-            FileUtils.writeStringToFile(new File("c:\\content.html"),
-                                        res.getContent(),
-                                        CharSets.UTF_8);
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
+	try {
+	    FileUtils.writeStringToFile(new File("c:\\content.html"), res
+		    .getContent(), CharSets.UTF_8);
+	} catch (IOException e) {
+	    e.printStackTrace();
+	}
 
-        Dump.dump("第二个页面生成完毕");
+	Dump.dump("第二个页面生成完毕");
 
-        return out;
+	return out;
     }
-
 
     /**
      * 
@@ -196,45 +162,39 @@ public class PriceSysBiz
      * @return
      */
     public TextHttpResponse login222(HttpServletRequest request,
-                                     String nickname,
-                                     String password)
-    {
+	    String nickname, String password) {
 
-        Map<String, String> params = new Hashtable<String, String>();
-        params.put("logon_name",
-                   StringUtils.trim(nickname));
-        params.put("logon_password",
-                   StringUtils.trim(password));
+	Map<String, String> params = new Hashtable<String, String>();
+	params.put("logon_name", StringUtils.trim(nickname));
+	params.put("logon_password", StringUtils.trim(password));
 
-        TextHttpResponse out = HttpUT
-                .post_response("http://192.168.1.215:8080/xj/l/login.do",
-                               params,
-                               CharSets.UTF_8);
-        
-//        Dump.dump("正在查看第二个页面");
-//        String nexturl = "http://192.168.1.215:8080/xj/adminCom/listComMgrtoAudit.do";
-//        TextHttpResponse res = HttpUT.get_response(nexturl,
-//                                                   null,
-//                                                   CharSets.UTF_8);
-//
-//        try
-//        {
-//            FileUtils.writeStringToFile(new File("c:\\content.html"),
-//                                        res.getContent(),
-//                                        CharSets.UTF_8);
-//        }
-//        catch (IOException e)
-//        {
-//            e.printStackTrace();
-//        }
+	TextHttpResponse out = HttpUT.post_response(
+		"http://192.168.1.215:8080/xj/l/login.do", params,
+		CharSets.UTF_8);
 
-        
-        Dump.dump("\r\n\r\n登录后返回的请求头");
-        Dump.dump(out.getHeads());
-        Dump.dump("\r\n\r\n");
-        
-        
-        return out;
+	// Dump.dump("正在查看第二个页面");
+	// String nexturl =
+	// "http://192.168.1.215:8080/xj/adminCom/listComMgrtoAudit.do";
+	// TextHttpResponse res = HttpUT.get_response(nexturl,
+	// null,
+	// CharSets.UTF_8);
+	//
+	// try
+	// {
+	// FileUtils.writeStringToFile(new File("c:\\content.html"),
+	// res.getContent(),
+	// CharSets.UTF_8);
+	// }
+	// catch (IOException e)
+	// {
+	// e.printStackTrace();
+	// }
+
+	Dump.dump("\r\n\r\n登录后返回的请求头");
+	Dump.dump(out.getHeads());
+	Dump.dump("\r\n\r\n");
+
+	return out;
     }
 
 }
